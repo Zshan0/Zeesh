@@ -1,7 +1,12 @@
 #include "header.h"
+#include "process_info.h"
 
 extern int buffer_size;
 extern int output_exit;
+extern int process_pid[1000];
+extern int number_of_jobs;
+extern struct Process proc[100];
+
 
 int append_or_not(char *input_str)
 {
@@ -172,6 +177,10 @@ void Command_execution(char *commands[],\
 		{
 			*old_pipe_output = 1;
 		}
+		else if(inbuilt_output(command) == 1)
+		{
+			*old_pipe_output = 1;
+		}
 		else	
 		{
 			Individual_command_execution(command, \
@@ -291,10 +300,12 @@ void Parent_execution(char *parsed[], int *fd,\
 	/*
 		Closing the write file. 
 	*/
+	proc[number_of_jobs].stat = 1;
+	proc[number_of_jobs++].pid = pid;
 	*old_pipe_input = fd[0];
 	close(fd[1]);
 	if(background == 0)
-	{		
+	{
 		int wstatus;
 		while((waitpid(pid, &wstatus, 0)) > 0)
 			break;

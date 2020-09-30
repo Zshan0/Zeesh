@@ -23,6 +23,15 @@
 #define CYAN "\033[0;36m"
 #define DEFAULT "\033[0m"
 extern int errno;
+
+
+struct Process
+{
+	pid_t pid;
+	char *name;
+	int stat;
+};
+
 void UI(int args, char *argv[]);
 void prompt();
 void parser(char *string, char *delim, char *array[]);
@@ -39,6 +48,8 @@ int foreground(char *parsed[]);
 int background(char *parsed[]);
 void signal_handler(int signum);
 void signal_setup();
+void jobs_updated();
+void status_update(pid_t pid, int status);
 void Command_execution(char *commands[], int *old_pipe_input, int *old_pipe_output);
 void Individual_command_execution(char *parsed[], int *old_pipe_input, int *old_pipe_output);
 void pipe_redirect(char *input_str);
@@ -47,3 +58,5 @@ void Pipe(char *command, int read_file, int write_file);
 void Child_execution(char *parsed[], int *fd, int *old_pipe_input, int *old_pipe_output, int background);
 void Parent_execution(char *parsed[], int *fd, int *old_pipe_input, int *old_pipe_output, pid_t pid, int background);
 int env(char *args[]);
+void display_jobs();
+int inbuilt_output(char *input_parsed[]);

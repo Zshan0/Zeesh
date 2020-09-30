@@ -10,6 +10,8 @@ int path_length = 100;
 int output_file_no = 1;
 int input_file_no = 1;
 int output_exit = 0;
+int number_of_jobs = 0;
+struct Process proc[100];
 
 
 int main(int args, char *argv[])

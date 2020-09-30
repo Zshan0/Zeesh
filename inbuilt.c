@@ -98,5 +98,16 @@ int inbuilt_no_output(char *input_parsed[])
 		return 1; 
 	}
 	return 0;
-
+}
+int inbuilt_output(char *input_parsed[])
+{
+	if(strcmp(input_parsed[0], "jobs") == 0)
+	{
+		// printf("here");
+		display_jobs();
+		fflush(stdout);
+		return 1;
+	}
+	else 
+		return 0;
 }

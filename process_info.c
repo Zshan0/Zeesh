@@ -56,7 +56,7 @@ char* process_name(pid_t pid)
 	int fd = open(proc_stat, O_RDONLY);
 	if(fd == -1)
 	{
-		perror("proc file:");
+		// perror("proc file:");
 		return '\0';
 	}
 	char *str = (char *) malloc(sizeof(char) * \
