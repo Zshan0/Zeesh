@@ -117,7 +117,7 @@ void pipe_redirect(char *input_str)
 	Command_execution(commands,\
 				 &old_pipe_input,\
 				  &old_pipe_output);
-	if(dup2(1, old_pipe_output) < 0)
+	if((old_pipe_output != -1) && (dup2(1, old_pipe_output) < 0))
 	{
 		perror("dup2 error:");
 		return;
@@ -135,7 +135,10 @@ void pipe_redirect(char *input_str)
 		perror("dup2 output:");
 		return ;
 	}
-	close(old_pipe_input);
+	if(old_pipe_input != 0)
+	{
+		close(old_pipe_input);
+	}
 }
 
 void Command_execution(char *commands[],\
@@ -165,9 +168,10 @@ void Command_execution(char *commands[],\
 			command[i] = commands[pos_commands];
 			pos_commands += 1;
 		}
-		if( (strcmp(command[0], "exit") == 0) ||\
-			(strcmp(command[0], "cd") == 0))
-			inbuilt_no_output(command);
+		if(inbuilt_no_output(command) == 1)
+		{
+			*old_pipe_output = 1;
+		}
 		else	
 		{
 			Individual_command_execution(command, \

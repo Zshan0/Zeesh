@@ -77,34 +77,26 @@ void inbuilt_argument_setter(char *input_parsed[])
 		input_parsed[0] = executable;
 	}
 	return ;
-	// pid_t id = fork();
-	// if(id == -1)
-	// {
-	// 	perror("fork inbuilt:");
-	// 	exit(1);
-	// }
-	// else if(id == 0)
-	// {
-	// 	if(execvp(executable, args) != -1)
-	// 	{
-	// 		free(executable); executable = NULL;
-	// 		fprintf(stderr, "inbuilt execvp\n");
-	// 		return ;
-	// 	}
-	// 	free(executable); executable = NULL;
-	// }
-	// else
-	// {
-	// 	int wstatus;
-	// 	while((waitpid(id, &wstatus, 0)) > 0)
-	// 		break;
-	// }
 }
 
-void inbuilt_no_output(char *input_parsed[])
+int inbuilt_no_output(char *input_parsed[])
 {
 	if(strcmp(input_parsed[0], "exit") == 0)
-			user_exit(input_parsed[0]);
+	{
+		user_exit(input_parsed[0]);
+		return 1;
+	}	
 	else if(strcmp(input_parsed[0], "cd") == 0)
+	{
 		change_dir(input_parsed);
+		return 1;
+	}
+	else if( (strcmp(input_parsed[0], "setenv") == 0)||\
+			(strcmp(input_parsed[0], "unsetenv") == 0))
+	{
+		env(input_parsed);
+		return 1; 
+	}
+	return 0;
+
 }
