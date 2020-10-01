@@ -103,9 +103,7 @@ int inbuilt_output(char *input_parsed[])
 {
 	if(strcmp(input_parsed[0], "jobs") == 0)
 	{
-		// printf("here");
 		display_jobs();
-		fflush(stdout);
 		return 1;
 	}
 	else 

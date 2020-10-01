@@ -32,6 +32,7 @@ void signal_setup()
 		perror("sigaction:");
 	if(sigaction(SIGTERM, &setup, NULL) < 0)
 		perror("sigaction:");
+
 }
 
 
@@ -39,9 +40,9 @@ void signal_setup()
 
 void signal_handler(int signum)
 {
+	// printf("SIGNAL: %d\n", signum);
 	if(signum == SIGINT)
 	{
-		status_update(getpid(), -1);
 		char output[1000];
 		sprintf(output, \
 			"\nProcess %d interrupted\n",\
@@ -51,13 +52,21 @@ void signal_handler(int signum)
 	}
 	else if(signum == SIGTERM)
 	{
-		status_update(getpid(), -1);
 		char output[1000];
 		sprintf(output, \
 			"\nProcess %d terminated\n", \
 			getpid());
 		write(2, output, strlen(output));
 		exit(1);
+	}
+	else if(signum == SIGSTOP)
+	{
+		char output[1000];
+		sprintf(output, \
+			"\nProcess %d stopped\n", \
+			getpid());
+		write(2, output, strlen(output));
+		exit(1);		
 	}
 	else if(signum == SIGCHLD)
 	{
@@ -66,9 +75,11 @@ void signal_handler(int signum)
 		jobs_updated();
 		int pid;
 		while((pid = \
-			waitpid(-1, &status, WNOHANG)) > 0)
+			waitpid(-1, &status, WUNTRACED\
+							 | WNOHANG)) > 0)
 		{
 			int i;
+			status_update(pid, status);
 			for(i = 0; i < number_of_jobs; i += 1)
 			{
 				if(proc[i].pid == pid)
@@ -78,7 +89,6 @@ void signal_handler(int signum)
 			}
 			if (WIFEXITED(status))
 			{
-				status_update(pid, -1);
 				sprintf(output, \
 				"\n%s with pid %d exited,status=%d\n", \
 				proc[i].name, pid, \
@@ -86,7 +96,6 @@ void signal_handler(int signum)
 			} 
 			else if (WIFSIGNALED(status))
 			{
-				status_update(pid, -1);
 				sprintf(output, \
 				"\n%s with pid %d killed by signal %d\n", \
 				proc[i].name, pid, \
@@ -94,7 +103,6 @@ void signal_handler(int signum)
 			}
 			else if (WIFSTOPPED(status)) 
 			{
-				status_update(pid, 0);
 				sprintf(output, \
 				"\n%s with pid %d stopped by signal %d\n", \
 				proc[i].name, pid, \
@@ -102,7 +110,6 @@ void signal_handler(int signum)
 			}
 			else if (WIFCONTINUED(status))
 			{
-				status_update(pid, 1);
 				sprintf(output, \
 				"\n%s with pid %d continued\n", \
 				proc[i].name, pid);

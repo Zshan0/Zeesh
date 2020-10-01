@@ -300,8 +300,6 @@ void Parent_execution(char *parsed[], int *fd,\
 	/*
 		Closing the write file. 
 	*/
-	proc[number_of_jobs].stat = 1;
-	proc[number_of_jobs++].pid = pid;
 	*old_pipe_input = fd[0];
 	close(fd[1]);
 	if(background == 0)
@@ -312,6 +310,8 @@ void Parent_execution(char *parsed[], int *fd,\
 	}
 	else 
 	{
+		proc[number_of_jobs].stat = 1;
+		proc[number_of_jobs++].pid = pid;
 		return ;
 	}
 }
