@@ -21,7 +21,7 @@ void inbuilt_argument_setter(char *input_parsed[])
 	{
 		strcat(executable, "/exec/print_history");
 		input_parsed[0] = executable;
-		char *input = PWD();
+		char *input = shell_path;
 		if(input_parsed[1] == NULL)
 		{
 			input_parsed[1] = "10";
@@ -106,6 +106,26 @@ int inbuilt_output(char *input_parsed[])
 		display_jobs();
 		return 1;
 	}
-	else 
+	else if(strcmp(input_parsed[0], "kjob") == 0)
+	{
+		Signal_processes(input_parsed);
+		return 1;
+	}
+	else if(strcmp(input_parsed[0], "fg") == 0)
+	{
+		job_ground(input_parsed);
+		return 1;
+	}
+	else if(strcmp(input_parsed[0], "bg") == 0)
+	{
+		job_ground(input_parsed);
+		return 1;
+	}
+	else if(strcmp(input_parsed[0], "overkill") == 0)
+	{
+		job_overkill();
+		return 1;
+	}
+	else
 		return 0;
 }

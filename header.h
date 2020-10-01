@@ -43,9 +43,7 @@ int inbuilt_no_output(char *input_parsed[]);
 void change_dir(char *parsed_input[]);
 void list_dir_contents(char *path, int a_flag, int l_flag);
 void history(char *input_parsed[]);
-void ground(char *parsed[]);
-int foreground(char *parsed[]);
-int background(char *parsed[]);
+void job_ground(char *parsed[]);
 void signal_handler(int signum);
 void signal_setup();
 void jobs_updated();
@@ -60,3 +58,5 @@ void Parent_execution(char *parsed[], int *fd, int *old_pipe_input, int *old_pip
 int env(char *args[]);
 void display_jobs();
 int inbuilt_output(char *input_parsed[]);
+void Signal_processes(char *input_parsed[]);
+void job_overkill();

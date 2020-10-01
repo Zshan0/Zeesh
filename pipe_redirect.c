@@ -32,6 +32,7 @@ void pipe_redirect(char *input_str)
 	char *commands[100];
 	int command_counter = 0;
 	int stdout_save = -1, stdin_save = -1;
+	int redirected = 0;
 	for(int i = 0; i < 100; i += 1)
 	{
 		if(parsed[i] == NULL)
@@ -46,8 +47,9 @@ void pipe_redirect(char *input_str)
 		{
 			i += 1;
 			output_file_pos = i;
+			redirected = 1;
 		}
-		else
+		else if(redirected == 0)
 		{
 			commands[command_counter]\
 						 = parsed[i];

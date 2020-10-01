@@ -5,7 +5,7 @@ extern int path_length;
 extern int output_exit;
 extern int number_of_jobs;
 extern struct Process proc[100];
-
+int paused;
 /*
 	Functions to handle the signals 
 	for interrupt, terminate and 
@@ -23,6 +23,7 @@ void signal_setup()
 	sigaddset (&setup.sa_mask, SIGINT);
 	sigaddset (&setup.sa_mask, SIGQUIT);
 	sigaddset (&setup.sa_mask, SIGCHLD);
+	// sigaddset (&setup.sa_mask, SIGCONT);
 	setup.sa_handler = signal_handler;
 
 	setup.sa_flags = SA_RESTART;
@@ -32,7 +33,6 @@ void signal_setup()
 		perror("sigaction:");
 	if(sigaction(SIGTERM, &setup, NULL) < 0)
 		perror("sigaction:");
-
 }
 
 
@@ -40,7 +40,6 @@ void signal_setup()
 
 void signal_handler(int signum)
 {
-	// printf("SIGNAL: %d\n", signum);
 	if(signum == SIGINT)
 	{
 		char output[1000];
@@ -48,6 +47,7 @@ void signal_handler(int signum)
 			"\nProcess %d interrupted\n",\
 			 getpid());
 		write(2, output, strlen(output));
+		fflush(stdout);
 		exit(1);
 	}
 	else if(signum == SIGTERM)
@@ -57,16 +57,8 @@ void signal_handler(int signum)
 			"\nProcess %d terminated\n", \
 			getpid());
 		write(2, output, strlen(output));
+		fflush(stdout);
 		exit(1);
-	}
-	else if(signum == SIGSTOP)
-	{
-		char output[1000];
-		sprintf(output, \
-			"\nProcess %d stopped\n", \
-			getpid());
-		write(2, output, strlen(output));
-		exit(1);		
 	}
 	else if(signum == SIGCHLD)
 	{
@@ -75,11 +67,11 @@ void signal_handler(int signum)
 		jobs_updated();
 		int pid;
 		while((pid = \
-			waitpid(-1, &status, WUNTRACED\
-							 | WNOHANG)) > 0)
+			waitpid(-1, &status, WUNTRACED|\
+							 	 WNOHANG|\
+							 	 WCONTINUED)) > 0)
 		{
 			int i;
-			status_update(pid, status);
 			for(i = 0; i < number_of_jobs; i += 1)
 			{
 				if(proc[i].pid == pid)
@@ -94,13 +86,6 @@ void signal_handler(int signum)
 				proc[i].name, pid, \
 				WEXITSTATUS(status));
 			} 
-			else if (WIFSIGNALED(status))
-			{
-				sprintf(output, \
-				"\n%s with pid %d killed by signal %d\n", \
-				proc[i].name, pid, \
-				WTERMSIG(status));
-			}
 			else if (WIFSTOPPED(status)) 
 			{
 				sprintf(output, \
@@ -114,8 +99,19 @@ void signal_handler(int signum)
 				"\n%s with pid %d continued\n", \
 				proc[i].name, pid);
 			}
+			else if (WIFSIGNALED(status))
+			{
+				sprintf(output, \
+				"\n%s with pid %d killed by signal %d\n", \
+				proc[i].name, pid, \
+				WTERMSIG(status));
+			}
+			status_update(pid, status);
 			if(output_exit == 0)
+			{
 				write(2, output, strlen(output));
+				// fflush(stdout);
+			}
 		}
 	}
 }

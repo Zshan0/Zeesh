@@ -13,7 +13,6 @@ int output_exit = 0;
 int number_of_jobs = 0;
 struct Process proc[100];
 
-
 int main(int args, char *argv[])
 {
 	hostname = NULL; systemname = NULL;
@@ -30,6 +29,11 @@ int main(int args, char *argv[])
         char *input_str = (char *) \
         				malloc(buffer_size * sizeof(char));
         int read_value = read(0, input_str, buffer_size);
+        if(read_value == 0)
+        {
+        	printf("\n");
+        	exit(0);
+        }
         input_str = realloc(input_str, \
         			(sizeof(char) * (read_value + 1)));
         input_str[read_value] = '\0';

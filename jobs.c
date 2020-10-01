@@ -54,7 +54,78 @@ void display_jobs()
 	fflush(stdout);
 }
 
-void Signal_processes(int signum, pid_t pid)
+void Signal_processes(char *parsed[])
 {
+	for(int i = 0; i <= 2; i += 1)
+	{
+		if(parsed[i] == NULL)
+		{
+			printf("Invalid number of arguments\nkjob job_num signal\n");
+			return;
+		}
+	}
+	/* 
+		index [1] followed by signum [2]
+	*/
+	char *end;	
+	int index = strtol(parsed[1], &end, 10);
+	int signum = strtol(parsed[2], &end, 10);
+	if(index > number_of_jobs || index <= 0)
+	{
+		printf("Not a valid job number\n");
+		return ;
+	}
+	pid_t req_pid = proc[index - 1].pid;
+	if(kill(req_pid, signum) == -1)
+	{
+		perror("kill:");
+		return;
+	}
+	jobs_updated();
+}
 
+void job_ground(char *parsed[])
+{
+	if(parsed[1] == NULL)
+	{
+		printf("Invalid number of arguments\nfd job_num\n");
+		return ;
+	}
+	char *end;
+	int index = strtol(parsed[1], &end, 10);
+	if(index > number_of_jobs || index <= 0)
+	{
+		printf("Not a valid job number\n");
+		return ;
+	}
+	pid_t req_pid = proc[index - 1].pid;
+	if(strcmp(parsed[0], "fg") == 0)
+	{
+		int wstatus;
+		while((waitpid(req_pid, &wstatus, 0)) > 0)
+			break;
+	}
+	else if(strcmp(parsed[0], "bg") == 0) 
+	{
+		if(kill(req_pid, 18) == -1)
+		{
+			perror("kill:");
+			return;
+		}
+	}
+	jobs_updated();
+}
+
+void job_overkill()
+{
+	for(int i = 0; i < number_of_jobs; i += 1)
+	{
+		pid_t pid = proc[i].pid;
+		if(kill(pid, SIGKILL) == -1)
+		{
+			perror("kill:");
+			return;
+		}
+	}
+	jobs_updated();
 }
