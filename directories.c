@@ -27,15 +27,14 @@ char* Relative_path(char *abs_path)
 		return abs_path;
 	char *new_path = (char *) \
 	malloc(sizeof(char) *\
-			 (abs_path_length - matched + 1));
-	new_path[0] = '~';
-	for(int i = matched; i <\
-				abs_path_length; i += 1)
-	{
-		new_path[(i + 1) - matched] =\
-					 abs_path[matched]; 
-	}
-	new_path[(abs_path_length) - matched + 1] = '\0';
+			 (path_length));
+    
+    new_path[0] = '~';
+    int index = 1;
+    for (int i = shell_path_length;\
+		     i < abs_path_length; i += 1)
+        new_path[index++] = abs_path[i];
+    new_path[index++] = '\0';
 	return new_path;
 }
 

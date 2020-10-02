@@ -110,6 +110,7 @@ void signal_handler(int signum)
 			{
 				write(2, output, strlen(output));
 				fflush(stdout);
+				prompt();
 			}
 		}
 	}
