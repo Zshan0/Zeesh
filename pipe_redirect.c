@@ -254,13 +254,19 @@ void Child_execution(char *parsed[], \
 				int *fd, int *old_pipe_input, \
 			int *old_pipe_output, int background)
 {
-	/* Changing the output
+	/* 
+		Changing the output
 		to fd[1], and the
 		input to old_pipe
 	*/
-
 	close(fd[0]);
-	/* Reading from the old
+	/* 
+		Default Execution of signal
+	*/
+	signal(SIGTSTP, SIG_DFL);
+	signal(SIGINT, SIG_DFL);
+	/* 
+		Reading from the old
 		file.
 	*/
 	if(dup2(*old_pipe_input, 0) < 0)
@@ -304,16 +310,18 @@ void Parent_execution(char *parsed[], int *fd,\
 	*/
 	*old_pipe_input = fd[0];
 	close(fd[1]);
+	proc[number_of_jobs].pid = pid;
 	if(background == 0)
 	{
+		proc[number_of_jobs++].stat = 127;
 		int wstatus;
-		while((waitpid(pid, &wstatus, 0)) > 0)
+		while(waitpid(pid, &wstatus, WUNTRACED) > 0)
 			break;
+		jobs_updated();
 	}
 	else 
 	{
-		proc[number_of_jobs].stat = 1;
-		proc[number_of_jobs++].pid = pid;
+		proc[number_of_jobs++].stat = 1;
 		return ;
 	}
 }

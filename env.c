@@ -40,6 +40,20 @@ int env(char *args[])
 			return 1;
 		}
 	}
+	else if(strcmp(command, "getenv") == 0)
+	{
+		if(name == NULL)
+		{
+			printf("No name specified\n");
+			return 1;
+		}
+		char *value = getenv(name);
+		if(value != NULL)
+			printf("%s\n", value);
+		else 
+			printf("variable not found\n");
+		return 1;
+	}
 	else
 	{
 		return 0;

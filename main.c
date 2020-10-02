@@ -1,7 +1,7 @@
 #include "header.h"
 
 extern int errno;
-char *shell_path;
+char *shell_path, *prev_dir;
 size_t buffer_size = 1000;
 char *hostname, *systemname;
 int hostname_size = 100;
@@ -12,6 +12,10 @@ int input_file_no = 1;
 int output_exit = 0;
 int number_of_jobs = 0;
 struct Process proc[100];
+int foreground_pid = 0;
+int foreground_wait = 1;
+int parent_pid;
+
 
 int main(int args, char *argv[])
 {
@@ -48,6 +52,7 @@ int main(int args, char *argv[])
         	pipe_redirect(parsed[pos]);
         	pos += 1;
         }   
+        jobs_updated();
         free(input_str); input_str = NULL;
     }
     return 0;

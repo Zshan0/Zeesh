@@ -6,7 +6,7 @@
     names for the prompt.
 */
 
-extern char *shell_path;
+extern char *shell_path, *prev_dir;
 extern size_t buffer_size;
 extern int output_file_no;
 extern int input_file_no;
@@ -14,7 +14,7 @@ extern char *hostname, *systemname;
 extern int hostname_size;
 extern int systemname_size;
 extern int path_length;
-
+extern int parent_pid;
 
 void UI(int args, char *argv[])
 {
@@ -35,6 +35,8 @@ void UI(int args, char *argv[])
             exit(1);
         }
         shell_path = PWD();
+        prev_dir = PWD();
+        parent_pid = getpid();
     }
     else 
     {

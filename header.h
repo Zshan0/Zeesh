@@ -60,3 +60,4 @@ void display_jobs();
 int inbuilt_output(char *input_parsed[]);
 void Signal_processes(char *input_parsed[]);
 void job_overkill();
+char* Relative_path(char *abs_path);

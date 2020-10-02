@@ -5,7 +5,6 @@ extern int path_length;
 extern int output_exit;
 extern int number_of_jobs;
 extern struct Process proc[100];
-int paused;
 /*
 	Functions to handle the signals 
 	for interrupt, terminate and 
@@ -23,16 +22,15 @@ void signal_setup()
 	sigaddset (&setup.sa_mask, SIGINT);
 	sigaddset (&setup.sa_mask, SIGQUIT);
 	sigaddset (&setup.sa_mask, SIGCHLD);
-	// sigaddset (&setup.sa_mask, SIGCONT);
 	setup.sa_handler = signal_handler;
 
 	setup.sa_flags = SA_RESTART;
 	if(sigaction(SIGCHLD, &setup, NULL) < 0)
 		perror("sigaction:");
-	if(sigaction(SIGINT, &setup, NULL) < 0)
-		perror("sigaction:");
 	if(sigaction(SIGTERM, &setup, NULL) < 0)
 		perror("sigaction:");
+	signal(SIGTSTP, SIG_IGN);
+	signal(SIGINT, SIG_IGN);
 }
 
 
@@ -40,17 +38,7 @@ void signal_setup()
 
 void signal_handler(int signum)
 {
-	if(signum == SIGINT)
-	{
-		char output[1000];
-		sprintf(output, \
-			"\nProcess %d interrupted\n",\
-			 getpid());
-		write(2, output, strlen(output));
-		fflush(stdout);
-		exit(1);
-	}
-	else if(signum == SIGTERM)
+	if(signum == SIGTERM)
 	{
 		char output[1000];
 		sprintf(output, \
@@ -60,12 +48,23 @@ void signal_handler(int signum)
 		fflush(stdout);
 		exit(1);
 	}
+	else if(signum == SIGTSTP)
+	{
+		printf("here\n");
+		fflush(stdout);	
+		if(kill(getpid(), SIGKILL) == -1)
+		{
+			perror("kill:");
+			return ;
+		}
+	}
 	else if(signum == SIGCHLD)
 	{
 		char output[1000];
 		int status;
 		jobs_updated();
 		int pid;
+		fflush(stdout);	
 		while((pid = \
 			waitpid(-1, &status, WUNTRACED|\
 							 	 WNOHANG|\
@@ -110,7 +109,7 @@ void signal_handler(int signum)
 			if(output_exit == 0)
 			{
 				write(2, output, strlen(output));
-				// fflush(stdout);
+				fflush(stdout);
 			}
 		}
 	}

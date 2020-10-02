@@ -13,7 +13,7 @@ void prompt()
 {
     char *rel = PWD();
     char *output = (char *) malloc(sizeof(char) * buffer_size);
-    sprintf(output, "%s%s%s@%s%s:%s>%s", GREEN, hostname, CYAN, GREEN, systemname, rel, DEFAULT);
+    sprintf(output, "%s%s%s@%s%s:%s>%s", GREEN, hostname, CYAN, GREEN, systemname, Relative_path(rel), DEFAULT);
     write(output_file_no, output, strlen(output));
     free(rel); rel = NULL;
 }

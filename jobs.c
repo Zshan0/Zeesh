@@ -12,7 +12,9 @@ void jobs_updated()
 	for(int i = 0; i < number_of_jobs; i += 1)
 	{
 		if(kill(proc[i].pid, 0) == -1)
+		{
 			continue;
+		}
 		dup[pos].pid = proc[i].pid;
 		dup[pos].name = process_name(proc[i].pid);
 		dup[pos].stat = proc[i].stat;
@@ -102,20 +104,32 @@ void job_ground(char *parsed[])
 	if(strcmp(parsed[0], "fg") == 0)
 	{
 		int wstatus;
-		while((waitpid(req_pid, &wstatus, 0)) > 0)
+		signal(SIGTTOU, SIG_IGN);
+		int terminal_pid = tcgetpgrp(0);
+		tcsetpgrp(0, req_pid);
+		tcsetpgrp(1, req_pid);
+		while(waitpid(req_pid, &wstatus, WUNTRACED) > 0)
 			break;
+		tcsetpgrp(1, terminal_pid);
+		tcsetpgrp(0, terminal_pid);
 	}
 	else if(strcmp(parsed[0], "bg") == 0) 
 	{
-		if(kill(req_pid, 18) == -1)
+		if(kill(req_pid, SIGCONT) == -1)
 		{
 			perror("kill:");
 			return;
 		}
+		
 	}
 	jobs_updated();
 }
 
+
+/* 
+	Kill all the child 
+	processes.
+*/ 
 void job_overkill()
 {
 	for(int i = 0; i < number_of_jobs; i += 1)

@@ -2,6 +2,7 @@
 extern char *shell_path;
 extern int buffer_size;
 extern int path_length;
+extern int parent_pid;
 
 void inbuilt_argument_setter(char *input_parsed[])
 {
@@ -16,6 +17,9 @@ void inbuilt_argument_setter(char *input_parsed[])
 	{	
 		strcat(executable, "/exec/pinfo");
 		input_parsed[0] = executable;
+		input_parsed[1] = (char *) malloc(sizeof(char) * 10);
+		sprintf(input_parsed[1], "%d", parent_pid);
+		input_parsed[2] = NULL;
 	}
 	else if(strcmp(input_parsed[0], "history") == 0)
 	{
@@ -92,7 +96,8 @@ int inbuilt_no_output(char *input_parsed[])
 		return 1;
 	}
 	else if( (strcmp(input_parsed[0], "setenv") == 0)||\
-			(strcmp(input_parsed[0], "unsetenv") == 0))
+			(strcmp(input_parsed[0], "unsetenv") == 0)||\
+			(strcmp(input_parsed[0], "getenv") == 0))
 	{
 		env(input_parsed);
 		return 1; 
