@@ -105,13 +105,15 @@ void job_ground(char *parsed[])
 	{
 		int wstatus;
 		signal(SIGTTOU, SIG_IGN);
+		kill(req_pid, SIGCONT);
 		int terminal_pid = tcgetpgrp(0);
 		tcsetpgrp(0, req_pid);
-		tcsetpgrp(1, req_pid);
-		while(waitpid(req_pid, &wstatus, WUNTRACED) > 0)
-			break;
-		tcsetpgrp(1, terminal_pid);
+		
+		waitpid(req_pid, &wstatus, WUNTRACED);
+
 		tcsetpgrp(0, terminal_pid);
+		signal(SIGTTOU, SIG_DFL);
+		jobs_updated();
 	}
 	else if(strcmp(parsed[0], "bg") == 0) 
 	{
