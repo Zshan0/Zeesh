@@ -95,7 +95,7 @@ You can run more than 1 shell command in  a single line by separating them with 
 - `ctrl+z` will kill send the current foreground process to the background and will stop the process.
 - `ctrl+c` will interrupt the currently running foreground process, if no foreground process is present, it will do nothing.
 
-### fg/bg [Incomplete]
+### fg/bg
 
 - `fg` can be used to bring a background process to the foreground process. The shell will only continue to execute after the process has terminated.
 - `bg` can be used to make a stopped background process run again.
